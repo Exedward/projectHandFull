@@ -155,6 +155,7 @@ gpio.add_event_detect(btMove, gpio.FALLING, callback=movimenta, bouncetime=200)
 # ------------------------------
 
 try:
+                
     while True:
         
         gpio.output(pulso, 0)
@@ -180,7 +181,7 @@ try:
             if delay.time() - tempo3 >= 55:
                 flagDelayFoto = False
                 
-        if 1000 * (delay.time() - tempo5) >= 60000:
+        if 1000 * (delay.time() - tempo5) >= 10000:
             tempo5 = delay.time()
             response = requests.get(urlBanco)
             if(response.status_code == 200):
