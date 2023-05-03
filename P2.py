@@ -18,7 +18,7 @@ passoMain = 0.001
 passoAjuste = 0.001
 
 # --- Horários De Execusão ----
-alarmes = [16.48, 21.39, 0.50]
+alarmes = [18.34, 21.39, 0.50]
 
 gpio.setmode(gpio.BOARD)
 gpio.setwarnings(False)

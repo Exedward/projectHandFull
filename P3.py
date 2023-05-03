@@ -18,6 +18,7 @@ contPress = 0
 bloqueio = 0
 passoMain = 0.001
 passoAjuste = 0.001
+horariosUltimo = {25.87}
 
 # ---- Constantes Auxiliares ----
 urlBanco = 'https://fir-exemplo-a5c5a.firebaseio.com/.json'
@@ -138,7 +139,7 @@ def enviaWhats():
 
     stringEnviar = f'*{stringDay}-{stringMes}-{agora.year}*: Sistema atuando *{agora.hour}h{agora.minute}min*.'
     print(stringEnviar)
-    pywhatkit.sendwhats_image(codeZap, "foto.jpg", stringEnviar, 15, True, 3)
+    pywhatkit.sendwhats_image(codeZap, "foto.jpg", stringEnviar, 25, True, 3)
 
 gpio.add_event_detect(btDirEnter, gpio.FALLING)
 
@@ -177,7 +178,7 @@ try:
                     tempo3 = delay.time()
                     enviaWhats() #Envia foto para whatsapp
                     break
-            print(round(delay.time() - tempo3))
+            #print(round(delay.time() - tempo3))
             if delay.time() - tempo3 >= 55:
                 flagDelayFoto = False
                 
@@ -195,12 +196,15 @@ try:
                 print(f'Horário: {agora}, codeZap: {codeZap}, Horários: {horarios}')
                 if horarios:
                     print('ok3')
+                    #if(str(horarios) != str(horariosUltimo)):
                     for key in horarios:
                         horario = horarios[key]
                         horas, minutos = horario.split(':')
                         print(f'Horas: {horas}, Minutos: {minutos}')
                         alarmes.append(float(f'{horas}.{minutos}'))
+                        print('ok5')
                         print(alarmes)
+                        horariosUltimo = horarios
                     
 except:
     pass
