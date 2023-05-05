@@ -6,7 +6,7 @@ import datetime as dataHora
 from datetime import datetime
 import pyrebase
 
-const firebaseConfig = {
+firebaseConfig = {
   "apiKey": "AIzaSyBUnwMLwC031nCWsOhjhDtu-0AX2ujloTw",
   "authDomain": "fir-exemplo-a5c5a.firebaseapp.com",
   "databaseURL": "https://fir-exemplo-a5c5a.firebaseio.com",

@@ -1,5 +1,5 @@
 import subprocess
-import pywhatkit
+#import pywhatkit
 import requests, json
 import RPi.GPIO as gpio
 import time as delay
@@ -126,20 +126,20 @@ def procedimentoMain():
     delay.sleep(3)  # Delay para descer bandeja
     desceSobe(False, limiteSuperior)  # Desce bandeja
     
-def enviaWhats():
-    agora = datetime.now()
-    if(agora.day < 10):
-        stringDay = f'0{agora.day}'
-    else:
-        stringDay = str(agora.day)
-    if(agora.month < 10):
-        stringMes = f'0{agora.month}'
-    else:
-        stringMes = str(agora.month)
+#def enviaWhats():
+    #agora = datetime.now()
+    #if(agora.day < 10):
+    #   stringDay = f'0{agora.day}'
+    #else:
+    #    stringDay = str(agora.day)
+    #if(agora.month < 10):
+    #    stringMes = f'0{agora.month}'
+    #else:
+    #    stringMes = str(agora.month)
 
-    stringEnviar = f'*{stringDay}-{stringMes}-{agora.year}*: Sistema atuando *{agora.hour}h{agora.minute}min*.'
-    print(stringEnviar)
-    pywhatkit.sendwhats_image(codeZap, "foto.jpg", stringEnviar, 30, True, 20)
+    #stringEnviar = f'*{stringDay}-{stringMes}-{agora.year}*: Sistema atuando *{agora.hour}h{agora.minute}min*.'
+    #print(stringEnviar)
+    #pywhatkit.sendwhats_image(codeZap, "foto.jpg", stringEnviar, 30, True, 20)
 
 gpio.add_event_detect(btDirEnter, gpio.FALLING)
 
@@ -176,34 +176,34 @@ try:
                     procedimentoMain()  # Executa operação
                     flagDelayFoto = True
                     tempo3 = delay.time()
-                    enviaWhats() #Envia foto para whatsapp
+                    #enviaWhats() #Envia foto para whatsapp
                     break
             #print(round(delay.time() - tempo3))
             if delay.time() - tempo3 >= 55:
                 flagDelayFoto = False
                 
-        if 1000 * (delay.time() - tempo5) >= 15000:
+        if 1000 * (delay.time() - tempo5) >= 60000:
             tempo5 = delay.time()
             response = requests.get(urlBanco)
             if(response.status_code == 200):
                 codeZap = response.json()['codZap']['code']
-                print('ok1')
+                #print('ok1')
                 if codeZap.find('com/') != -1:
                     nada, codeZap = codeZap.split('com/')
-                    print('ok2')
+                    #print('ok2')
                 horarios = response.json()['horarios']
                 agora = datetime.now()
-                print(f'Horário: {agora}, codeZap: {codeZap}, Horários: {horarios}')
+                #print(f'Horário: {agora}, codeZap: {codeZap}, Horários: {horarios}')
                 if horarios:
-                    print('ok3')
+                    #print('ok3')
                     alarmes = []
                     for key in horarios:
                         horario = horarios[key]
                         horas, minutos = horario.split(':')
-                        print(f'Horas: {horas}, Minutos: {minutos}')
+                        #print(f'Horas: {horas}, Minutos: {minutos}')
                         alarmes.append(float(f'{horas}.{minutos}'))
-                        print('ok5')
-                        print(alarmes)
+                        #print('ok5')
+                        #print(alarmes)
 
 except:
     pass
