@@ -1,10 +1,20 @@
 import subprocess
-import pywhatkit
 import requests, json
 import RPi.GPIO as gpio
 import time as delay
 import datetime as dataHora
 from datetime import datetime
+import pyrebase
+
+const firebaseConfig = {
+  "apiKey": "AIzaSyBUnwMLwC031nCWsOhjhDtu-0AX2ujloTw",
+  "authDomain": "fir-exemplo-a5c5a.firebaseapp.com",
+  "databaseURL": "https://fir-exemplo-a5c5a.firebaseio.com",
+  "projectId": "fir-exemplo-a5c5a",
+  "storageBucket": "fir-exemplo-a5c5a.appspot.com",
+  "messagingSenderId": "778887383601",
+  "appId": "1:778887383601:web:0252e146fb453d4ae72310"
+};
 
 # ---- Mapeamente de Hardware ----
 btMove, btDirEnter, btDelete, enable, dir, pulso = 11, 10, 12, 16, 18, 19
@@ -24,14 +34,14 @@ horariosUltimo = {25.87}
 urlBanco = 'https://fir-exemplo-a5c5a.firebaseio.com/.json'
 
 # --- Horários De Execusão ----
-alarmes = [] #[16.48, 21.39, 0.50]
+alarmes = []  # [16.48, 21.39, 0.50]
 
 gpio.setmode(gpio.BOARD)
 gpio.setwarnings(False)
 
-gpio.setup(btMove, gpio.IN, pull_up_down = gpio.PUD_UP)
-gpio.setup(btDirEnter, gpio.IN, pull_up_down = gpio.PUD_UP)
-gpio.setup(btDelete, gpio.IN, pull_up_down = gpio.PUD_UP)
+gpio.setup(btMove, gpio.IN, pull_up_down=gpio.PUD_UP)
+gpio.setup(btDirEnter, gpio.IN, pull_up_down=gpio.PUD_UP)
+gpio.setup(btDelete, gpio.IN, pull_up_down=gpio.PUD_UP)
 gpio.setup(motorPasso, gpio.OUT)
 gpio.setup(ledRestart, gpio.OUT)
 gpio.setup(ledConfir, gpio.OUT)
@@ -42,13 +52,14 @@ gpio.output(enable, 1)
 gpio.output(dir, 0)
 gpio.output(ledConfir, 0)  # ledConfirm = Led RESTART
 
-#gpio.add_event_detect(btDelete, gpio.FALLING, callback=funBtDelete, bouncetime=200)
+
+# gpio.add_event_detect(btDelete, gpio.FALLING, callback=funBtDelete, bouncetime=200)
 
 # ---- Funções Auxiliares ----
-#def funBtDelete():
+# def funBtDelete():
 #    pass
 
-def movimenta(GPIO):  #btMove - Função para movimentar bandeja
+def movimenta(GPIO):  # btMove - Função para movimentar bandeja
     global contPassos, libera, passo, passoAjuste
     tempo4 = 0
     if libera:
@@ -69,6 +80,7 @@ def movimenta(GPIO):  #btMove - Função para movimentar bandeja
             contPassos += 1
         else:
             contPassos -= 1
+
 
 def inverteDir(GPIO):  # btDirEnter -Funçao para mudar de direção a bandeja, e para desativar bloqueio de reinício
     global contPassos, bitDir, limiteSuperior, libera, timeLedConfir, liberaLedConfir, contPress, flagCalibrado
@@ -98,6 +110,7 @@ def inverteDir(GPIO):  # btDirEnter -Funçao para mudar de direção a bandeja, 
                 liberaLedConfir = True
                 break
 
+
 def pulsos():
     global pulso, passoMain
     gpio.output(pulso, 1)
@@ -109,6 +122,7 @@ def pulsos():
     tempo4 = delay.time_ns()
     while delay.time_ns() - tempo4 < 2000000:
         continue
+
 
 def desceSobe(DIR, limiar):  # DIR=False(desce bandeja)
     gpio.output(dir, DIR)
@@ -125,21 +139,21 @@ def procedimentoMain():
     subprocess.call("./tiraFoto.sh")  # Tira foto
     delay.sleep(3)  # Delay para descer bandeja
     desceSobe(False, limiteSuperior)  # Desce bandeja
-    
+
+
 def enviaWhats():
     agora = datetime.now()
-    if(agora.day < 10):
+    if (agora.day < 10):
         stringDay = f'0{agora.day}'
     else:
         stringDay = str(agora.day)
-    if(agora.month < 10):
+    if (agora.month < 10):
         stringMes = f'0{agora.month}'
     else:
         stringMes = str(agora.month)
 
     stringEnviar = f'*{stringDay}-{stringMes}-{agora.year}*: Sistema atuando *{agora.hour}h{agora.minute}min*.'
     print(stringEnviar)
-    pywhatkit.sendwhats_image(codeZap, "foto.jpg", stringEnviar, 30, True, 20)
 
 gpio.add_event_detect(btDirEnter, gpio.FALLING)
 
@@ -156,12 +170,13 @@ gpio.add_event_detect(btMove, gpio.FALLING, callback=movimenta, bouncetime=200)
 # ------------------------------
 
 try:
-                
+
     while True:
-        
+
         gpio.output(pulso, 0)
-        
-        if liberaLedConfir and 1000 * (delay.time() - timeLedConfir) >= 1500:  # Aciona Led de confirmação ou de reinício
+
+        if liberaLedConfir and 1000 * (
+                delay.time() - timeLedConfir) >= 1500:  # Aciona Led de confirmação ou de reinício
             gpio.output(ledConfir, 0)
             liberaLedConfir = False
             if flagCalibrado:
@@ -176,16 +191,16 @@ try:
                     procedimentoMain()  # Executa operação
                     flagDelayFoto = True
                     tempo3 = delay.time()
-                    enviaWhats() #Envia foto para whatsapp
+                    enviaWhats()  # Envia foto para whatsapp
                     break
-            #print(round(delay.time() - tempo3))
+            # print(round(delay.time() - tempo3))
             if delay.time() - tempo3 >= 55:
                 flagDelayFoto = False
-                
+
         if 1000 * (delay.time() - tempo5) >= 15000:
             tempo5 = delay.time()
             response = requests.get(urlBanco)
-            if(response.status_code == 200):
+            if (response.status_code == 200):
                 codeZap = response.json()['codZap']['code']
                 print('ok1')
                 if codeZap.find('com/') != -1:
